@@ -2,7 +2,7 @@ import Sprite from "./Sprite.js";
 
 class Player extends Sprite {
     constructor({context, position, imageSrc, gravity, frameRate}) {
-        super({context, position, imageSrc, frameRate})
+        super({context, position, imageSrc, frameRate, frameDelay: 4})
         this.position = position
         this.gravity = gravity
         this.velocity = {x: 0, y: 0}
@@ -46,6 +46,7 @@ class Player extends Sprite {
     play() {
         this.create()
         this.createHitBox()
+        this.animate()
 
         this.position.y += this.velocity.y
         this.position.x += this.velocity.x
