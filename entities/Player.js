@@ -1,8 +1,9 @@
 import Sprite from "./Sprite.js";
 
 class Player extends Sprite {
-    constructor({context, position, imageSrc, gravity, frameRate}) {
-        super({context, position, imageSrc, frameRate, frameDelay: 4})
+    constructor({context, position, gravity, image}) {
+        const {imageSrc, frameRate, frameDelay} = image
+        super({context, position, imageSrc, frameRate, frameDelay: frameDelay})
         this.position = position
         this.gravity = gravity
         this.velocity = {x: 0, y: 0}
