@@ -1,6 +1,7 @@
 import './style.css'
-import Player from "./Player.js"
-
+import Player from "./entities/Player.js"
+import Sprite from "./entities/Sprite.js";
+import bgUrl from "./public/background.png"
 const CANVAS_WIDTH = 1024
 const CANVAS_HEIGHT = 576
 const GRAVITY = 9.8 / 6
@@ -9,16 +10,35 @@ const cxt = canvas.getContext('2d');
 canvas.width = CANVAS_WIDTH
 canvas.height = CANVAS_HEIGHT
 
-function refreshFrame(context) {
-    context.fillStyle = 'white'
-    context.fillRect(0, 0, canvas.width, canvas.height)
+const BG_SCALE = 4
+
+const scaledCanvas = {
+    height: CANVAS_HEIGHT / BG_SCALE,
+    width: CANVAS_WIDTH / BG_SCALE
 }
 
+function zoom(context, scale, cb) {
+    context.save()
+    context.scale(scale, scale)
+
+    cb()
+    context.restore()
+}
+
+const bg = new Sprite({context: cxt, position: {x: 0, y: 0 }, imageSrc: bgUrl})
 const playerA = new Player(cxt, 'red', 300, 100, 50, 50, GRAVITY, {x: 9, y: 25})
 
 function play() {
     window.requestAnimationFrame(play)
-    refreshFrame(cxt)
+
+    // Zoom in
+
+    // All the dimension of unscale objects should be divided by scale factor when it calculates inside this zoom in
+    zoom(cxt, BG_SCALE, () => {
+        cxt.translate(0,   -bg.image.height + scaledCanvas.height)
+        bg.create()
+    })
+
     playerA.create().play()
 }
 
