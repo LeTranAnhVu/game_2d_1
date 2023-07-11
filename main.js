@@ -2,6 +2,7 @@ import './style.css'
 import Player from "./entities/Player.js"
 import Sprite from "./entities/Sprite.js";
 import bgUrl from "./public/background.png"
+import idleUrl from "./public/player/Idle.png"
 const CANVAS_WIDTH = 1024
 const CANVAS_HEIGHT = 576
 const GRAVITY = 9.8 / 6
@@ -26,7 +27,7 @@ function zoom(context, scale, cb) {
 }
 
 const bg = new Sprite({context: cxt, position: {x: 0, y: 0 }, imageSrc: bgUrl})
-const playerA = new Player(cxt, 'red', 300, 100, 50, 50, GRAVITY, {x: 9, y: 25})
+const playerA = new Player({context: cxt, position: {x: 100, y: 300}, imageSrc: idleUrl, gravity: GRAVITY, frameRate: 8})
 
 function play() {
     window.requestAnimationFrame(play)
@@ -39,21 +40,21 @@ function play() {
         bg.create()
     })
 
-    playerA.create().play()
+    playerA.play()
 }
 
 play()
 
 window.addEventListener('keydown', (event) => {
     if (['ArrowLeft', 'a'].includes(event.key)) {
-        playerA.moveLeft()
+        playerA.moveLeft(9)
     } else if (['ArrowRight', 'd'].includes(event.key)) {
-        playerA.moveRight()
+        playerA.moveRight(9)
     } else if (['ArrowDown', 's'].includes(event.key)) {
         // don't need
     } else if ([' ', 'w', 'ArrowUp'].includes(event.key)) {
         // Jump
-        playerA.jump()
+        playerA.jump(25)
     }
 })
 
