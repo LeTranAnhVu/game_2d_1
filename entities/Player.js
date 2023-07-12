@@ -51,7 +51,7 @@ class Player extends Sprite {
 
         this.position.y += this.velocity.y
         this.position.x += this.velocity.x
-        const height = this.image.height
+        const height = this.height
         // Gravity
         if (this.position.y + height < this.context.canvas.height) {
             this.velocity.y += this.gravity

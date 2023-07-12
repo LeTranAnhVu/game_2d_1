@@ -91,7 +91,7 @@ function play() {
 
     // All the dimension of unscale objects should be divided by scale factor when it calculates inside this zoom in
     zoom(cxt, BG_SCALE, () => {
-        cxt.translate(0,   -bg.image.height + scaledCanvas.height)
+        cxt.translate(0,   - bg.height + scaledCanvas.height)
         bg.create()
     })
 
