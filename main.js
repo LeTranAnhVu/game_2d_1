@@ -10,6 +10,8 @@ import fallUrl from "./public/player/Fall.png"
 import fallLeftUrl from "./public/player/FallLeft.png"
 import jumpUrl from "./public/player/Jump.png"
 import jumpLeftUrl from "./public/player/JumpLeft.png"
+import Box from "./entities/Box.js";
+import box from "./entities/Box.js";
 const CANVAS_WIDTH = 1024
 const CANVAS_HEIGHT = 576
 const GRAVITY = 9.8 / 6
@@ -77,18 +79,67 @@ const playerImages = {
 }
 
 const bg = new Sprite({context: cxt, position: {x: 0, y: 0 }, imageSrc: bgUrl})
-const playerA = new Player({
+
+
+const box1 = new Box({
     context: cxt,
-    position: {x: 100, y: 300},
-    gravity: GRAVITY,
-    image: playerImages.idle
+    position: {x: 600, y:0},
+    width: 90,
+    height: 100,
+    color: 'rgb(255,37,116)',
+    gravity: GRAVITY
 })
 
+
+const box2 = new Box({
+    context: cxt,
+    position: {x: 0, y:0},
+    width: 200,
+    height: 60,
+    color: 'rgb(255,37,116)',
+    gravity: GRAVITY
+})
+
+const box3 = new Box({
+    context: cxt,
+    position: {x: 550, y:270},
+    width: 400,
+    height: 60,
+    color: 'rgb(255,37,116)',
+    gravity: null
+})
+
+const box4 = new Box({
+    context: cxt,
+    position: {x: 700, y:0},
+    width: 90,
+    height: 150,
+    color: 'rgb(255,37,116)',
+    gravity: GRAVITY
+})
+
+const box5 = new Box({
+    context: cxt,
+    position: {x: 800, y:0},
+    width: 90,
+    height: 50,
+    color: 'rgb(255,37,116)',
+    gravity: GRAVITY
+})
+
+const obstacles = [box1, box2, box3, box4, box5]
+
+const playerA = new Player({
+    context: cxt,
+    position: {x: 500, y: 300},
+    gravity: GRAVITY,
+    image: playerImages.idle,
+    obstacles: obstacles
+})
 function play() {
     window.requestAnimationFrame(play)
 
     // Zoom in
-
     // All the dimension of unscale objects should be divided by scale factor when it calculates inside this zoom in
     zoom(cxt, BG_SCALE, () => {
         cxt.translate(0,   - bg.height + scaledCanvas.height)
@@ -96,6 +147,7 @@ function play() {
     })
 
     playerA.play()
+    obstacles.forEach(object => object.play())
 }
 
 play()
