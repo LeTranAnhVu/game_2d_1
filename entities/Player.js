@@ -1,28 +1,5 @@
 import Sprite from "./Sprite.js";
-
-function isCollided(boxA, boxB) {
-    const aTop = boxA.position.y
-    const aBottom = boxA.position.y + boxA.height
-    const aLeft = boxA.position.x
-    const aRight = boxA.position.x + boxA.width
-
-    const bTop = boxB.position.y
-    const bBottom = boxB.position.y + boxB.height
-    const bLeft = boxB.position.x
-    const bRight = boxB.position.x + boxB.width
-
-    if (aRight >= bLeft &&
-        aLeft <= bRight &&
-        aBottom >= bTop &&
-        aTop <= bBottom) {
-        const overlaps = [bRight - aLeft, bBottom - aTop, aRight - bLeft, aBottom - bTop]
-        const minValue = Math.min(...overlaps)
-        const index = overlaps.indexOf(minValue)
-        return index + 1 // 1 ==> left, 2 ==> top, 3 ==> right, 4 ==> bottom
-    }
-
-    return 0
-}
+import {isCollided} from "../utils/IsCollided.js";
 
 class Player extends Sprite {
     constructor({context, position, gravity, image, obstacles = []}) {
@@ -34,34 +11,37 @@ class Player extends Sprite {
         this.isJumping = false
         this.maxJumpCount = 2
         this.jumpCount = 0
-        this.hitBox = {
-            relativePosition: {
-                x: 64, y: 45
-            }, width: 35, height: 64
-        }
-
         this.obstacles = obstacles
-        this.collidedObstacle = null
     }
 
     events = {
         landed: []
     }
 
-    hitBox = {
-        relativePosition: {
-            x: 64, y: 45
-        }, width: 35, height: 64
+    getHitBox() {
+        const width = 35
+        const height =64
+        const x = this.position.x + this.width/2 - width/2
+        const y = this.position.y + this.height - height
+        return {
+            position: {
+                x: x,
+                y: y
+            },
+            width: width,
+            height: height
+        }
     }
 
     createHitBox() {
-        if (!this.hitBox) return
+        const hitBox = this.getHitBox()
+        if (!hitBox) return
         this.context.fillStyle = 'rgba(0, 255, 0, 0.2)'
         this.context.fillRect(
-            this.position.x + this.hitBox.relativePosition.x,
-            this.position.y + this.hitBox.relativePosition.y,
-            this.hitBox.width,
-            this.hitBox.height)
+            hitBox.position.x,
+             hitBox.position.y,
+            hitBox.width,
+            hitBox.height)
     }
 
     isMovingLeft = () => this.velocity.x < 0
@@ -70,30 +50,32 @@ class Player extends Sprite {
     isFalling = () => this.velocity.y > 0
 
     applyMovement() {
+        const hitBox = this.getHitBox()
         for (let obstacle of this.obstacles) {
-            const pos = isCollided(this, obstacle)
+            const pos = isCollided(hitBox, obstacle)
             if (pos) {
                 if (this.isMovingUp() && pos === 2) {
                     this.velocity.y = 0
-                    this.position.y = obstacle.position.y + obstacle.height
-                    break
+                    this.position.y = obstacle.position.y + obstacle.height - Math.abs(this.height - hitBox.height) - 0.01
+                    // break
                 }
 
                 if (this.isFalling() && pos === 4) {
                     this.velocity.y = 0
-                    this.position.y = obstacle.position.y - this.height
-                    break
+                    this.position.y = obstacle.position.y - this.height + 0.01
+                    // break
                 }
+
                 if (this.isMovingLeft() && pos === 1) {
                     this.velocity.x = 0
-                    this.position.x = obstacle.position.x + obstacle.width
-                    break
+                    this.position.x = obstacle.position.x + obstacle.width - (this.width - hitBox.width)/2
+                    // break
                 }
 
                 if (this.isMovingRight() && pos === 3) {
                     this.velocity.x = 0
-                    this.position.x = obstacle.position.x - this.width
-                    break
+                    this.position.x = obstacle.position.x - this.width  + (this.width - hitBox.width)/2
+                    // break
                 }
             }
         }
@@ -102,10 +84,15 @@ class Player extends Sprite {
         this.position.x += this.velocity.x
 
         if (this.position.y + this.height >= this.context.canvas.height) {
-            this.velocity.y = !this.isMovingUp() ? 0 : this.velocity.y
+            this.velocity.y = this.isFalling() ? 0 : this.velocity.y
             this.position.y = this.context.canvas.height - this.height
         }
 
+        // Block left
+        if (this.position.x <= 0) {
+            this.velocity.x = this.isMovingLeft() ? 0 : this.velocity.x
+            this.position.x = 0
+        }
     }
 
     addGravity() {
@@ -116,7 +103,7 @@ class Player extends Sprite {
         this.create()
         this.createHitBox()
         this.animate()
-        this.applyMovement()
+
         if (this.velocity.y === 0) {
             // Reset the jumping state
             this.isJumping = false
@@ -132,6 +119,9 @@ class Player extends Sprite {
         }
 
         this.addGravity()
+        this.applyMovement()
+
+
         return this
     }
 
