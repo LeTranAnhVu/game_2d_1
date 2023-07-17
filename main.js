@@ -35,7 +35,7 @@ function zoom(context, scale, cb) {
     context.restore()
 }
 
-const playerImages = {
+const playerAnimations = {
     idle: {
         imageSrc: idleUrl,
         frameRate: 8,
@@ -133,7 +133,7 @@ const playerA = new Player({
     context: cxt,
     position: {x: 500, y: 300},
     gravity: GRAVITY,
-    image: playerImages.idle,
+    image: playerAnimations.idle,
     obstacles: obstacles
 })
 function play() {
