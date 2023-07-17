@@ -14,7 +14,7 @@ import Box from "./entities/Box.js";
 import box from "./entities/Box.js";
 const CANVAS_WIDTH = 1024
 const CANVAS_HEIGHT = 576
-const GRAVITY = 9.8 / 6
+const GRAVITY = 9.8 / 10
 const canvas = document.querySelector('canvas')
 const cxt = canvas.getContext('2d');
 canvas.width = CANVAS_WIDTH
@@ -49,12 +49,12 @@ const playerAnimations = {
     run: {
         imageSrc: runUrl,
         frameRate: 8,
-        frameDelay: 3
+        frameDelay: 5
     },
     runLeft: {
         imageSrc: runLeftUrl,
         frameRate: 8,
-        frameDelay: 3
+        frameDelay: 5
     },
     fall: {
         imageSrc: fallUrl,
@@ -78,7 +78,7 @@ const playerAnimations = {
     },
 }
 
-const bg = new Sprite({context: cxt, position: {x: 0, y: 0 }, imageSrc: bgUrl})
+const bg = new Sprite({context: cxt, position: {x: 0, y: 0 }, image: {imageSrc: bgUrl, frameRate: 1, frameDelay: 1}})
 
 
 const box1 = new Box({
@@ -102,8 +102,8 @@ const box2 = new Box({
 
 const box3 = new Box({
     context: cxt,
-    position: {x: 550, y:270},
-    width: 400,
+    position: {x: 350, y:270},
+    width: 150,
     height: 60,
     color: 'rgb(255,37,116)',
     gravity: null
@@ -133,7 +133,7 @@ const playerA = new Player({
     context: cxt,
     position: {x: 500, y: 300},
     gravity: GRAVITY,
-    image: playerAnimations.idle,
+    animations: playerAnimations,
     obstacles: obstacles
 })
 function play() {
@@ -154,14 +154,14 @@ play()
 
 window.addEventListener('keydown', (event) => {
     if (['ArrowLeft', 'a'].includes(event.key)) {
-        playerA.moveLeft(9)
+        playerA.moveLeft(4)
     } else if (['ArrowRight', 'd'].includes(event.key)) {
-        playerA.moveRight(9)
+        playerA.moveRight(4)
     } else if (['ArrowDown', 's'].includes(event.key)) {
         // don't need
     } else if ([' ', 'w', 'ArrowUp'].includes(event.key)) {
         // Jump
-        playerA.jump(25)
+        playerA.jump(20 )
     }
 })
 

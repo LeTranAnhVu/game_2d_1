@@ -1,13 +1,17 @@
 class Sprite {
-    constructor({context, position, imageSrc, frameRate = 1, frameDelay = 1}) {
+    constructor({context, position, image}) {
         this.context = context
         this.position = position
-        this.frameRate = frameRate
+        this.changeImage(image)
+    }
+
+    changeImage(imageMeta) {
+        this.frameRate = imageMeta.frameRate
         this.sourceX = 0
         this.currentFrame = 0
-        this.frameDelay = frameDelay
+        this.frameDelay = imageMeta.frameDelay
         const image = new Image()
-        image.src = imageSrc
+        image.src = imageMeta.imageSrc
         image.onload = () => {
             this.image = image
             this.width = this.image.width / this.frameRate
