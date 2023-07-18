@@ -68,7 +68,7 @@ class Player extends Sprite {
 
                 if (this.isMovingLeft() && pos === 1) {
                     this.velocity.x = 0
-                    this.position.x = obstacle.position.x + obstacle.width - (this.width - hitBox.width) / 2 + 0.02
+                    this.position.x = obstacle.position.x + obstacle.width - (this.width - hitBox.width) / 2 + 0.02 // TODO fix it later
                     // break
                 } else if (this.isMovingRight() && pos === 3) {
                     this.velocity.x = 0
