@@ -2,8 +2,8 @@ import Sprite from "./Sprite.js";
 import {isCollided} from "../utils/IsCollided.js";
 
 class Player extends Sprite {
-    constructor({context, position, gravity, animations, obstacles = []}) {
-        super({context, position, image: animations.idle})
+    constructor({context, position, gravity, animations, scale, obstacles = []}) {
+        super({context, position, scale, image: animations.idle})
         this.isRightDirection = true
         this.animations = animations
         this.currentAnimation = animations.idle
@@ -21,8 +21,8 @@ class Player extends Sprite {
     }
 
     getHitBox() {
-        const width = 35
-        const height = 64
+        const width = 38 * this.scale
+        const height = 64  * this.scale
         const x = this.position.x + this.width / 2 - width / 2
         const y = this.position.y + this.height - height
         return {
@@ -60,9 +60,7 @@ class Player extends Sprite {
                     this.velocity.y = 0
                     this.position.y = obstacle.position.y + obstacle.height - Math.abs(this.height - hitBox.height) - 0.01
                     // break
-                }
-
-                if (this.isFalling() && pos === 4) {
+                } else if (this.isFalling() && pos === 4) {
                     this.velocity.y = 0
                     this.position.y = obstacle.position.y - this.height + 0.01
                     // break
@@ -70,13 +68,12 @@ class Player extends Sprite {
 
                 if (this.isMovingLeft() && pos === 1) {
                     this.velocity.x = 0
-                    this.position.x = obstacle.position.x + obstacle.width - (this.width - hitBox.width) / 2
+                    this.position.x = obstacle.position.x + obstacle.width - (this.width - hitBox.width) / 2 + 0.02
                     // break
-                }
-
-                if (this.isMovingRight() && pos === 3) {
+                } else if (this.isMovingRight() && pos === 3) {
                     this.velocity.x = 0
-                    this.position.x = obstacle.position.x - this.width + (this.width - hitBox.width) / 2
+                    this.position.x = obstacle.position.x - this.width + (this.width - hitBox.width) / 2 - 0.02
+
                     // break
                 }
             }
@@ -85,15 +82,15 @@ class Player extends Sprite {
         this.position.y += this.velocity.y
         this.position.x += this.velocity.x
 
-        if (this.position.y + this.height >= this.context.canvas.height) {
-            this.velocity.y = this.isFalling() ? 0 : this.velocity.y
+        if (this.position.y + this.height >= this.context.canvas.height && this.isFalling()) {
+            this.velocity.y = 0
             this.position.y = this.context.canvas.height - this.height
         }
 
         // Block left
-        if (this.position.x <= 0) {
-            this.velocity.x = this.isMovingLeft() ? 0 : this.velocity.x
-            this.position.x = 0
+        if (this.position.x <= 0 - (this.width - hitBox.width) / 2 && this.isMovingLeft()) {
+            this.velocity.x = 0
+            this.position.x = 0 - (this.width - hitBox.width) / 2
         }
     }
 
@@ -137,7 +134,6 @@ class Player extends Sprite {
         }
 
         if (this.currentAnimation.imageSrc !== nextAnimation.imageSrc) {
-            console.log('waht');
             this.changeImage(nextAnimation)
             this.currentAnimation = nextAnimation
         }

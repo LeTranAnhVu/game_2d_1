@@ -15,7 +15,7 @@ export function isCollided(boxA, boxB) {
         aTop <= bBottom) {
         const overlaps = [bRight - aLeft, bBottom - aTop, aRight - bLeft, aBottom - bTop]
         const minValue = Math.min(...overlaps)
-        const index = overlaps.indexOf(minValue)
+        const index = overlaps.lastIndexOf(minValue) // Put the bottom as higher priority
         return index + 1 // 1 ==> left, 2 ==> top, 3 ==> right, 4 ==> bottom
     }
 

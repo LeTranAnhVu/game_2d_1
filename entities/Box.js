@@ -10,8 +10,12 @@ class Box {
     }
 
     create() {
-        this.context.fillStyle = this.color
-        this.context.fillRect(this.position.x, this.position.y, this.width, this.height)
+        // this.context.fillStyle = this.color
+        this.context.beginPath()
+        this.context.strokeStyle = 'rgb(78,135,255)'
+        this.context.rect(this.position.x, this.position.y, this.width, this.height)
+        this.context.stroke()
+        this.context.closePath()
     }
 
     applyMovement() {

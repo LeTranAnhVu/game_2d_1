@@ -10,11 +10,10 @@ import fallUrl from "./public/player/Fall.png"
 import fallLeftUrl from "./public/player/FallLeft.png"
 import jumpUrl from "./public/player/Jump.png"
 import jumpLeftUrl from "./public/player/JumpLeft.png"
-import Box from "./entities/Box.js";
-import box from "./entities/Box.js";
+import {buildBoxesFromTiles, from1DTo2D} from "./utils/tiled.js";
 const CANVAS_WIDTH = 1024
 const CANVAS_HEIGHT = 576
-const GRAVITY = 9.8 / 10
+const GRAVITY = 9.8 / 20
 const canvas = document.querySelector('canvas')
 const cxt = canvas.getContext('2d');
 canvas.width = CANVAS_WIDTH
@@ -80,61 +79,46 @@ const playerAnimations = {
 
 const bg = new Sprite({context: cxt, position: {x: 0, y: 0 }, image: {imageSrc: bgUrl, frameRate: 1, frameDelay: 1}})
 
+const tiledFloorCollisions = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+    202, 202, 202, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+    0, 0, 202, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+    0, 0, 202, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+    0, 0, 0, 202, 202, 202, 202, 202, 202, 202, 202, 202, 202, 202, 202, 202, 202, 202, 202, 202, 202, 202, 202, 202, 202, 202, 202, 202, 202, 202, 202, 202, 202, 202, 202, 202,
+    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
 
-const box1 = new Box({
-    context: cxt,
-    position: {x: 600, y:0},
-    width: 90,
-    height: 100,
-    color: 'rgb(255,37,116)',
-    gravity: GRAVITY
-})
+const floorCollisionTiles = from1DTo2D(tiledFloorCollisions, 36)
 
-
-const box2 = new Box({
-    context: cxt,
-    position: {x: 0, y:0},
-    width: 200,
-    height: 60,
-    color: 'rgb(255,37,116)',
-    gravity: GRAVITY
-})
-
-const box3 = new Box({
-    context: cxt,
-    position: {x: 350, y:270},
-    width: 150,
-    height: 60,
-    color: 'rgb(255,37,116)',
-    gravity: null
-})
-
-const box4 = new Box({
-    context: cxt,
-    position: {x: 700, y:0},
-    width: 90,
-    height: 150,
-    color: 'rgb(255,37,116)',
-    gravity: GRAVITY
-})
-
-const box5 = new Box({
-    context: cxt,
-    position: {x: 800, y:0},
-    width: 90,
-    height: 50,
-    color: 'rgb(255,37,116)',
-    gravity: GRAVITY
-})
-
-const obstacles = [box1, box2, box3, box4, box5]
+const floorCollisionBoxes = buildBoxesFromTiles(floorCollisionTiles, cxt, 16)
 
 const playerA = new Player({
     context: cxt,
-    position: {x: 500, y: 300},
+    position: {x: 100, y: 1},
     gravity: GRAVITY,
+    scale: 0.5,
     animations: playerAnimations,
-    obstacles: obstacles
+    // obstacles: [],
+    obstacles: floorCollisionBoxes,
 })
 function play() {
     window.requestAnimationFrame(play)
@@ -144,24 +128,23 @@ function play() {
     zoom(cxt, BG_SCALE, () => {
         cxt.translate(0,   - bg.height + scaledCanvas.height)
         bg.create()
+        floorCollisionBoxes.forEach(b => b.play())
+        playerA.play()
     })
-
-    playerA.play()
-    obstacles.forEach(object => object.play())
 }
 
 play()
 
 window.addEventListener('keydown', (event) => {
     if (['ArrowLeft', 'a'].includes(event.key)) {
-        playerA.moveLeft(4)
+        playerA.moveLeft(5)
     } else if (['ArrowRight', 'd'].includes(event.key)) {
-        playerA.moveRight(4)
+        playerA.moveRight(5)
     } else if (['ArrowDown', 's'].includes(event.key)) {
         // don't need
     } else if ([' ', 'w', 'ArrowUp'].includes(event.key)) {
         // Jump
-        playerA.jump(20 )
+        playerA.jump(8 )
     }
 })
 
