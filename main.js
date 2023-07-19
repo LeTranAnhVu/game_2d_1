@@ -38,12 +38,12 @@ const playerAnimations = {
     idle: {
         imageSrc: idleUrl,
         frameRate: 8,
-        frameDelay: 3
+        frameDelay: 4
     },
     idleLeft: {
         imageSrc: idleLeftUrl,
         frameRate: 8,
-        frameDelay: 3
+        frameDelay: 4
     },
     run: {
         imageSrc: runUrl,
@@ -137,9 +137,9 @@ play()
 
 window.addEventListener('keydown', (event) => {
     if (['ArrowLeft', 'a'].includes(event.key)) {
-        playerA.moveLeft(5)
+        playerA.moveLeft(3)
     } else if (['ArrowRight', 'd'].includes(event.key)) {
-        playerA.moveRight(5)
+        playerA.moveRight(3)
     } else if (['ArrowDown', 's'].includes(event.key)) {
         // don't need
     } else if ([' ', 'w', 'ArrowUp'].includes(event.key)) {

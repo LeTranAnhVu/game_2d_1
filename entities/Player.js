@@ -35,6 +35,15 @@ class Player extends Sprite {
         }
     }
 
+    findThePossibleCollidedObstacles() {
+        const hitBox = this.getHitBox()
+        const horizontalHitBoxCenter = (hitBox.position.x + hitBox.position.x + hitBox.width) / 2
+        let collidedObstacles = this.obstacles.filter(o => {
+            return o.position.x - o.width <= horizontalHitBoxCenter && horizontalHitBoxCenter <= o.position.x + o.width + o.width
+        })
+        return collidedObstacles
+    }
+
     createHitBox() {
         const hitBox = this.getHitBox()
         if (!hitBox) return
@@ -53,7 +62,8 @@ class Player extends Sprite {
 
     applyMovement() {
         const hitBox = this.getHitBox()
-        for (let obstacle of this.obstacles) {
+        const collidedObstacles = this.findThePossibleCollidedObstacles()
+        for (let obstacle of collidedObstacles) {
             const pos = isCollided(hitBox, obstacle)
             if (pos) {
                 if (this.isMovingUp() && pos === 2) {
@@ -99,7 +109,7 @@ class Player extends Sprite {
     }
 
     play() {
-        this.create()
+        if(!this.create()) return false
         this.createHitBox()
         this.animate()
 

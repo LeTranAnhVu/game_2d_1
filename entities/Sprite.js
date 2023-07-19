@@ -21,7 +21,7 @@ class Sprite {
     }
 
     create() {
-        if (!this.image) return
+        if (!this.image) return false
         this.context.fillStyle = 'rgba(255, 0, 0, 0.2)'
         this.context.fillRect(this.position.x, this.position.y, this.width, this.height)
         this.context.drawImage(
@@ -31,6 +31,8 @@ class Sprite {
             this.position.x, this.position.y,
             this.width, this.height,
         )
+
+        return true
     }
 
     animate() {
