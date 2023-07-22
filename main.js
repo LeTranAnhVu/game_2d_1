@@ -95,11 +95,15 @@ const playerA = new Player({
     animations: playerAnimations,
     obstacles: floorCollisionBoxes,
     platformObstacles: platformCollisionBoxes,
+    // environment: {
+    //     width: 576,
+    //     height: 432
+    // }
 })
 const camera = {
     position: {
         x: 0,
-        y: -bg.height + scaledCanvas.height
+        y: undefined
     },
 
     width: scaledCanvas.width,
@@ -112,16 +116,32 @@ function play() {
     // Zoom in
     // All the dimension of unscale objects should be divided by scale factor when it calculates inside this zoom in
     zoom(cxt, BG_SCALE, () => {
-        cxt.translate(camera.position.x, -bg.height + scaledCanvas.height)
+        const translateY = isNaN(camera.position.y) ? -bg.height + scaledCanvas.height : camera.position.y
+        cxt.translate(camera.position.x, translateY)
         bg.create()
-        floorCollisionBoxes.forEach(b => b.play())
-        platformCollisionBoxes.forEach(b => b.play())
+        camera.position.y = camera.position.y === undefined || isNaN(camera.position.y) ? -bg.height + scaledCanvas.height : camera.position.y
+        // floorCollisionBoxes.forEach(b => b.play())
+        // platformCollisionBoxes.forEach(b => b.play())
+
+        playerA.loadEnvironment({width: bg.width, height: bg.height})
         playerA.play()
         playerA.shouldPanCameraToTheLeft(Math.abs(camera.position.x), (delta) => {
             camera.position.x += delta
         })
-        playerA.shouldPanCameraToTheRight( scaledCanvas.width + Math.abs(camera.position.x), (delta) => {
+        playerA.shouldPanCameraToTheRight(scaledCanvas.width + Math.abs(camera.position.x), (delta) => {
             camera.position.x -= delta
+        })
+
+        playerA.shouldPanCameraToTheTop(Math.abs(camera.position.y), (delta) => {
+            camera.position.y += delta
+        })
+
+        playerA.shouldPanCameraToTheBottom((Math.abs(camera.position.y) + scaledCanvas.height / 1.5) , (delta) => {
+            if (camera.position.y  <= -bg.height + scaledCanvas.height) {
+                camera.position.y = -bg.height + scaledCanvas.height
+            } else {
+                camera.position.y -= delta
+            }
         })
     })
 }

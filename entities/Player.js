@@ -16,10 +16,15 @@ class Player extends Sprite {
         this.jumpCount = 0
         this.obstacles = obstacles
         this.platformObstacles = platformObstacles
+        this.environment = {height: null, width : null}
     }
 
     events = {
         landed: []
+    }
+
+    loadEnvironment(env) {
+        this.environment = env
     }
 
     getHitBox() {
@@ -39,7 +44,7 @@ class Player extends Sprite {
 
     getCameraView() {
         const width = 380 * this.scale
-        const height = 170 * this.scale
+        const height = 85 * this.scale
         const x = this.position.x + this.width / 2 - width / 2
         const y = this.position.y + this.height - height
         return {
@@ -83,26 +88,46 @@ class Player extends Sprite {
             cam.height)
     }
 
-    shouldPanCameraToTheRight(bgRight, cb){
+    shouldPanCameraToTheRight(bgRight, cb) {
         const cam = this.getCameraView()
-        if(!cam) return
+        if (!cam) return
         const camRight = cam.position.x + cam.width
 
-        if(camRight >= 2304/4) return
+        if (camRight >= this.environment.width) return
 
-        if(camRight >= bgRight){
-            cb(camRight-bgRight)
+        if (camRight >= bgRight) {
+            cb(camRight - bgRight)
         }
     }
 
-    shouldPanCameraToTheLeft(bgLeft, cb){
+    shouldPanCameraToTheLeft(bgLeft, cb) {
         const cam = this.getCameraView()
-        if(!cam) return
+        if (!cam) return
 
-        if(cam.position.x <= 0) return
+        if (cam.position.x <= 0) return
 
-        if(cam.position.x <= bgLeft){
+        if (cam.position.x <= bgLeft) {
             cb(bgLeft - cam.position.x)
+        }
+    }
+
+    shouldPanCameraToTheTop(bgTop, cb) {
+        const cam = this.getCameraView()
+        if (!cam) return
+
+        if (cam.position.y <= 0 ) return
+
+        if (cam.position.y <= Math.abs(bgTop)) {
+            cb(Math.abs(bgTop) - cam.position.y )
+        }
+    }
+
+    shouldPanCameraToTheBottom(baseline, cb) {
+        const cam = this.getCameraView()
+        if (!cam) return
+        const camBottom = cam.position.y + cam.height
+        if (camBottom >= Math.abs(baseline)) {
+            cb(camBottom - Math.abs(baseline))
         }
     }
 
@@ -167,9 +192,9 @@ class Player extends Sprite {
         this.position.y += this.velocity.y
         this.position.x += this.velocity.x
 
-        if (this.position.y + this.height >= 1728 / 4 && this.isFalling()) {
+        if (this.position.y + this.height >= this.environment.height && this.isFalling()) {
             this.velocity.y = 0
-            this.position.y = 1728 / 4 - this.height
+            this.position.y = this.environment.height - this.height
         }
 
         // Block left
@@ -179,9 +204,9 @@ class Player extends Sprite {
         }
 
         // Block right
-        if (this.position.x + this.width >= 2304 / 4 + (this.width - hitBox.width) / 2 && this.isMovingRight()) {
+        if (this.position.x + this.width >= this.environment.width + (this.width - hitBox.width) / 2 && this.isMovingRight()) {
             this.velocity.x = 0
-            this.position.x = 2304 / 4 + (this.width - hitBox.width) / 2 - this.width
+            this.position.x =  this.environment.width + (this.width - hitBox.width) / 2 - this.width
         }
     }
 
@@ -191,7 +216,7 @@ class Player extends Sprite {
 
     play() {
         if (!this.create()) return false
-        this.createHitBox()
+        // this.createHitBox()
         // this.createCameraView()
         this.animate()
 
