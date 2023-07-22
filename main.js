@@ -50,6 +50,7 @@ const playerAnimations = {
         frameDelay: 2
     },
     idleLeft: {
+        isReversed: true,
         imageSrc: idleLeftUrl,
         frameRate: 8,
         frameDelay: 2
@@ -60,6 +61,7 @@ const playerAnimations = {
         frameDelay: 4
     },
     runLeft: {
+        isReversed: true,
         imageSrc: runLeftUrl,
         frameRate: 8,
         frameDelay: 4
@@ -70,6 +72,7 @@ const playerAnimations = {
         frameDelay: 2
     },
     fallLeft: {
+        isReversed: true,
         imageSrc: fallLeftUrl,
         frameRate: 2,
         frameDelay: 2
@@ -80,6 +83,7 @@ const playerAnimations = {
         frameDelay: 2
     },
     jumpLeft: {
+        isReversed: true,
         imageSrc: jumpLeftUrl,
         frameRate: 2,
         frameDelay: 2
@@ -87,12 +91,13 @@ const playerAnimations = {
     lightAttack: {
         imageSrc: attack1Url,
         frameRate: 4,
-        frameDelay: 5
+        frameDelay: 3
     },
     lightAttackLeft: {
+        isReversed: true,
         imageSrc: attack1LeftUrl,
         frameRate: 4,
-        frameDelay: 5
+        frameDelay: 3
     },
     mediumAttack: {
         imageSrc: attack2Url,
@@ -100,6 +105,7 @@ const playerAnimations = {
         frameDelay: 5
     },
     mediumAttackLeft: {
+        isReversed: true,
         imageSrc: attack2LeftUrl,
         frameRate: 4,
         frameDelay: 5
@@ -107,9 +113,10 @@ const playerAnimations = {
     heavyAttack: {
         imageSrc: attack3Url,
         frameRate: 4,
-        frameDelay: 5
+        frameDelay: 6
     },
     heavyAttackLeft: {
+        isReversed: true,
         imageSrc: attack3LeftUrl,
         frameRate: 4,
         frameDelay: 5
