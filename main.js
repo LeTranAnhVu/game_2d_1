@@ -11,6 +11,7 @@ import fallLeftUrl from "./public/player/FallLeft.png"
 import jumpUrl from "./public/player/Jump.png"
 import jumpLeftUrl from "./public/player/JumpLeft.png"
 import {buildBoxesFromTiles, from1DTo2D} from "./utils/tiled.js";
+
 const CANVAS_WIDTH = 1024
 const CANVAS_HEIGHT = 576
 const GRAVITY = 9.8 / 20
@@ -38,22 +39,22 @@ const playerAnimations = {
     idle: {
         imageSrc: idleUrl,
         frameRate: 8,
-        frameDelay: 4
+        frameDelay: 2
     },
     idleLeft: {
         imageSrc: idleLeftUrl,
         frameRate: 8,
-        frameDelay: 4
+        frameDelay: 2
     },
     run: {
         imageSrc: runUrl,
         frameRate: 8,
-        frameDelay: 5
+        frameDelay: 4
     },
     runLeft: {
         imageSrc: runLeftUrl,
         frameRate: 8,
-        frameDelay: 5
+        frameDelay: 4
     },
     fall: {
         imageSrc: fallUrl,
@@ -77,7 +78,7 @@ const playerAnimations = {
     },
 }
 
-const bg = new Sprite({context: cxt, position: {x: 0, y: 0 }, image: {imageSrc: bgUrl, frameRate: 1, frameDelay: 1}})
+const bg = new Sprite({context: cxt, position: {x: 0, y: 0}, image: {imageSrc: bgUrl, frameRate: 1, frameDelay: 1}})
 
 const tiledFloorCollisions = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
     0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
@@ -117,18 +118,27 @@ const playerA = new Player({
     gravity: GRAVITY,
     scale: 0.5,
     animations: playerAnimations,
-    // obstacles: [],
     obstacles: floorCollisionBoxes,
 })
+const camera = {
+    position: {
+        x: 0,
+        y: -bg.height + scaledCanvas.height
+    },
+
+    width: scaledCanvas.width,
+    height: scaledCanvas.height
+}
+
 function play() {
     window.requestAnimationFrame(play)
 
     // Zoom in
     // All the dimension of unscale objects should be divided by scale factor when it calculates inside this zoom in
     zoom(cxt, BG_SCALE, () => {
-        cxt.translate(0,   - bg.height + scaledCanvas.height)
+        cxt.translate(camera.position.x, -bg.height + scaledCanvas.height)
         bg.create()
-        floorCollisionBoxes.forEach(b => b.play())
+        // floorCollisionBoxes.forEach(b => b.play())
         playerA.play()
     })
 }
@@ -137,14 +147,20 @@ play()
 
 window.addEventListener('keydown', (event) => {
     if (['ArrowLeft', 'a'].includes(event.key)) {
-        playerA.moveLeft(3)
+        playerA.moveLeft(2)
+        playerA.shouldPanCameraToTheLeft(Math.abs(camera.position.x), (delta) => {
+            camera.position.x += delta
+        })
     } else if (['ArrowRight', 'd'].includes(event.key)) {
-        playerA.moveRight(3)
+        playerA.moveRight(2)
+        playerA.shouldPanCameraToTheRight( scaledCanvas.width + Math.abs(camera.position.x), (delta) => {
+            camera.position.x -= delta
+        })
     } else if (['ArrowDown', 's'].includes(event.key)) {
         // don't need
     } else if ([' ', 'w', 'ArrowUp'].includes(event.key)) {
         // Jump
-        playerA.jump(8 )
+        playerA.jump(8)
     }
 })
 

@@ -22,8 +22,8 @@ class Sprite {
 
     create() {
         if (!this.image) return false
-        this.context.fillStyle = 'rgba(255, 0, 0, 0.2)'
-        this.context.fillRect(this.position.x, this.position.y, this.width, this.height)
+        // this.context.fillStyle = 'rgba(255, 0, 0, 0.2)'
+        // this.context.fillRect(this.position.x, this.position.y, this.width, this.height)
         this.context.drawImage(
             this.image,
             this.sourceX, 0,
