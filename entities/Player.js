@@ -2,7 +2,7 @@ import Sprite from "./Sprite.js";
 import {isCollided} from "../utils/IsCollided.js";
 
 class Player extends Sprite {
-    constructor({context, position, gravity, animations, scale, obstacles = []}) {
+    constructor({context, position, gravity, animations, scale, obstacles = [], platformObstacles = []}) {
         const offset = {bottom: -5}
         super({context, position, scale, image: animations.idle, offset})
         this.isRightDirection = true
@@ -15,6 +15,7 @@ class Player extends Sprite {
         this.maxJumpCount = 2
         this.jumpCount = 0
         this.obstacles = obstacles
+        this.platformObstacles = platformObstacles
     }
 
     events = {
@@ -23,7 +24,7 @@ class Player extends Sprite {
 
     getHitBox() {
         const width = 38 * this.scale
-        const height = 64  * this.scale
+        const height = 64 * this.scale
         const x = this.position.x + this.width / 2 - width / 2
         const y = this.position.y + this.height - height
         return {
@@ -38,7 +39,7 @@ class Player extends Sprite {
 
     getCameraView() {
         const width = 380 * this.scale
-        const height = 170  * this.scale
+        const height = 170 * this.scale
         const x = this.position.x + this.width / 2 - width / 2
         const y = this.position.y + this.height - height
         return {
@@ -51,10 +52,10 @@ class Player extends Sprite {
         }
     }
 
-    findThePossibleCollidedObstacles() {
+    findThePossibleCollidedObstacles(obstacles) {
         const hitBox = this.getHitBox()
         const horizontalHitBoxCenter = (hitBox.position.x + hitBox.position.x + hitBox.width) / 2
-        let collidedObstacles = this.obstacles.filter(o => {
+        let collidedObstacles = obstacles.filter(o => {
             return o.position.x - o.width <= horizontalHitBoxCenter && horizontalHitBoxCenter <= o.position.x + o.width + o.width
         })
         return collidedObstacles
@@ -112,7 +113,7 @@ class Player extends Sprite {
 
     applyMovement() {
         const hitBox = this.getHitBox()
-        const collidedObstacles = this.findThePossibleCollidedObstacles()
+        const collidedObstacles = this.findThePossibleCollidedObstacles(this.obstacles)
         for (let obstacle of collidedObstacles) {
             const pos = isCollided(hitBox, obstacle)
             if (pos) {
@@ -139,6 +140,30 @@ class Player extends Sprite {
             }
         }
 
+
+        const collidedPlatformObstacles = this.findThePossibleCollidedObstacles(this.platformObstacles)
+        for (let obstacle of collidedPlatformObstacles) {
+            const pos = isCollided(hitBox, obstacle)
+            if (pos) {
+                if (this.isFalling() && pos === 4) {
+                    this.velocity.y = 0
+                    this.position.y = obstacle.position.y - this.height + 0.01
+                    // break
+                }
+
+                // if (this.isMovingLeft() && pos === 1) {
+                //     this.velocity.x = 0
+                //     this.position.x = obstacle.position.x + obstacle.width - (this.width - hitBox.width) / 2 + 0.02
+                //     // break
+                // } else if (this.isMovingRight() && pos === 3) {
+                //     this.velocity.x = 0
+                //     this.position.x = obstacle.position.x - this.width + (this.width - hitBox.width) / 2 - 0.02
+                //
+                //     // break
+                // }
+            }
+        }
+
         this.position.y += this.velocity.y
         this.position.x += this.velocity.x
 
@@ -154,18 +179,19 @@ class Player extends Sprite {
         }
 
         // Block right
-        if (this.position.x + this.width >= 2304/4 + (this.width - hitBox.width) / 2 && this.isMovingRight()) {
+        if (this.position.x + this.width >= 2304 / 4 + (this.width - hitBox.width) / 2 && this.isMovingRight()) {
             this.velocity.x = 0
-            this.position.x = 2304/4 + (this.width - hitBox.width) / 2 - this.width
+            this.position.x = 2304 / 4 + (this.width - hitBox.width) / 2 - this.width
         }
     }
+
     addGravity() {
         this.velocity.y += this.gravity
     }
 
     play() {
-        if(!this.create()) return false
-        // this.createHitBox()
+        if (!this.create()) return false
+        this.createHitBox()
         // this.createCameraView()
         this.animate()
 
