@@ -10,6 +10,13 @@ import fallUrl from "./public/player/Fall.png"
 import fallLeftUrl from "./public/player/FallLeft.png"
 import jumpUrl from "./public/player/Jump.png"
 import jumpLeftUrl from "./public/player/JumpLeft.png"
+import attack1Url from "./public/player/Attack1.png"
+import attack1LeftUrl from "./public/player/Attack1Left.png"
+import attack2Url from "./public/player/Attack2.png"
+import attack2LeftUrl from "./public/player/Attack2Left.png"
+import attack3Url from "./public/player/Attack3.png"
+import attack3LeftUrl from "./public/player/Attack3Left.png"
+
 import {buildBoxesFromTiles, from1DTo2D} from "./utils/tiled.js";
 import {tiledFloorCollisions, tiledPlatformCollisions} from "./utils/tiledCollisions.js";
 
@@ -77,6 +84,36 @@ const playerAnimations = {
         frameRate: 2,
         frameDelay: 2
     },
+    lightAttack: {
+        imageSrc: attack1Url,
+        frameRate: 4,
+        frameDelay: 5
+    },
+    lightAttackLeft: {
+        imageSrc: attack1LeftUrl,
+        frameRate: 4,
+        frameDelay: 5
+    },
+    mediumAttack: {
+        imageSrc: attack2Url,
+        frameRate: 4,
+        frameDelay: 5
+    },
+    mediumAttackLeft: {
+        imageSrc: attack2LeftUrl,
+        frameRate: 4,
+        frameDelay: 5
+    },
+    heavyAttack: {
+        imageSrc: attack3Url,
+        frameRate: 4,
+        frameDelay: 5
+    },
+    heavyAttackLeft: {
+        imageSrc: attack3LeftUrl,
+        frameRate: 4,
+        frameDelay: 5
+    },
 }
 
 const bg = new Sprite({context: cxt, position: {x: 0, y: 0}, image: {imageSrc: bgUrl, frameRate: 1, frameDelay: 1}})
@@ -136,8 +173,8 @@ function play() {
             camera.position.y += delta
         })
 
-        playerA.shouldPanCameraToTheBottom((Math.abs(camera.position.y) + scaledCanvas.height / 1.5) , (delta) => {
-            if (camera.position.y  <= -bg.height + scaledCanvas.height) {
+        playerA.shouldPanCameraToTheBottom((Math.abs(camera.position.y) + scaledCanvas.height / 1.5), (delta) => {
+            if (camera.position.y <= -bg.height + scaledCanvas.height) {
                 camera.position.y = -bg.height + scaledCanvas.height
             } else {
                 camera.position.y -= delta
@@ -158,6 +195,15 @@ window.addEventListener('keydown', (event) => {
     } else if ([' ', 'w', 'ArrowUp'].includes(event.key)) {
         // Jump
         playerA.jump(6)
+    } else if (['j'].includes(event.key)) {
+        // Attach
+        playerA.attack(1)
+    } else if (['k'].includes(event.key)) {
+        // Attach
+        playerA.attack(2)
+    } else if (['l'].includes(event.key)) {
+        // Attach
+        playerA.attack(3)
     }
 })
 
@@ -170,5 +216,8 @@ window.addEventListener('keyup', (event) => {
         // don't need
     } else if ([' ', 'w', 'ArrowUp'].includes(event.key)) {
         playerA.endJump()
+    } else if (['j', 'k', 'l'].includes(event.key)) {
+        // Attach
+        playerA.stopAttack()
     }
 })

@@ -12,11 +12,13 @@ class Player extends Sprite {
         this.gravity = gravity
         this.velocity = {x: 0, y: 0}
         this.isJumping = false
+        this.isAttacking = false
+        this.attackType = 0 // 1 ---> light, 2 medium, 3 heavy
         this.maxJumpCount = 2
         this.jumpCount = 0
         this.obstacles = obstacles
         this.platformObstacles = platformObstacles
-        this.environment = {height: null, width : null}
+        this.environment = {height: null, width: null}
     }
 
     events = {
@@ -115,10 +117,10 @@ class Player extends Sprite {
         const cam = this.getCameraView()
         if (!cam) return
 
-        if (cam.position.y <= 0 ) return
+        if (cam.position.y <= 0) return
 
         if (cam.position.y <= Math.abs(bgTop)) {
-            cb(Math.abs(bgTop) - cam.position.y )
+            cb(Math.abs(bgTop) - cam.position.y)
         }
     }
 
@@ -206,7 +208,7 @@ class Player extends Sprite {
         // Block right
         if (this.position.x + this.width >= this.environment.width + (this.width - hitBox.width) / 2 && this.isMovingRight()) {
             this.velocity.x = 0
-            this.position.x =  this.environment.width + (this.width - hitBox.width) / 2 - this.width
+            this.position.x = this.environment.width + (this.width - hitBox.width) / 2 - this.width
         }
     }
 
@@ -236,9 +238,18 @@ class Player extends Sprite {
 
         this.addGravity()
         this.applyMovement()
+        this.changeAnimation();
 
+        return this
+    }
+
+    changeAnimation() {
         let nextAnimation = this.animations.idle
-        if (this.isMovingUp()) {
+        if (this.isAttacking) {
+            const attackAnimations = [null, this.animations.lightAttack, this.animations.mediumAttack, this.animations.heavyAttack]
+            const leftAttackAnimations = [null, this.animations.lightAttackLeft, this.animations.mediumAttackLeft, this.animations.heavyAttackLeft]
+            nextAnimation = this.isRightDirection ? attackAnimations[this.attackType] : leftAttackAnimations[this.attackType]
+        } else if (this.isMovingUp()) {
             nextAnimation = this.isRightDirection ? this.animations.jump : this.animations.jumpLeft
         } else if (this.isFalling()) {
             nextAnimation = this.isRightDirection ? this.animations.fall : this.animations.fallLeft
@@ -254,8 +265,6 @@ class Player extends Sprite {
             this.changeImage(nextAnimation)
             this.currentAnimation = nextAnimation
         }
-
-        return this
     }
 
     stopHorizontalMovement() {
@@ -290,6 +299,16 @@ class Player extends Sprite {
         if (this.jumpCount < this.maxJumpCount) {
             this.isJumping = false
         }
+    }
+
+    attack(attackType) {
+        this.isAttacking = true
+        this.attackType = attackType
+    }
+
+    stopAttack() {
+        this.isAttacking = false
+        this.attackType = 0
     }
 }
 
