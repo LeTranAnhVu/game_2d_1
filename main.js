@@ -140,6 +140,12 @@ function play() {
         bg.create()
         // floorCollisionBoxes.forEach(b => b.play())
         playerA.play()
+        playerA.shouldPanCameraToTheLeft(Math.abs(camera.position.x), (delta) => {
+            camera.position.x += delta
+        })
+        playerA.shouldPanCameraToTheRight( scaledCanvas.width + Math.abs(camera.position.x), (delta) => {
+            camera.position.x -= delta
+        })
     })
 }
 
@@ -148,14 +154,8 @@ play()
 window.addEventListener('keydown', (event) => {
     if (['ArrowLeft', 'a'].includes(event.key)) {
         playerA.moveLeft(2)
-        playerA.shouldPanCameraToTheLeft(Math.abs(camera.position.x), (delta) => {
-            camera.position.x += delta
-        })
     } else if (['ArrowRight', 'd'].includes(event.key)) {
         playerA.moveRight(2)
-        playerA.shouldPanCameraToTheRight( scaledCanvas.width + Math.abs(camera.position.x), (delta) => {
-            camera.position.x -= delta
-        })
     } else if (['ArrowDown', 's'].includes(event.key)) {
         // don't need
     } else if ([' ', 'w', 'ArrowUp'].includes(event.key)) {
