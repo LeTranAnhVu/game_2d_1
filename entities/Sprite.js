@@ -1,8 +1,9 @@
 class Sprite {
-    constructor({context, position, image, scale = 1}) {
+    constructor({context, position, image, scale = 1, offset = null}) {
         this.context = context
         this.position = position
         this.scale = scale
+        this.offset = offset
         this.changeImage(image)
     }
 
@@ -27,7 +28,7 @@ class Sprite {
         this.context.drawImage(
             this.image,
             this.sourceX, 0,
-            this.image.width / this.frameRate, this.image.height,
+            this.image.width / this.frameRate, this.image.height + (this.offset?.bottom || 0),
             this.position.x, this.position.y,
             this.width, this.height,
         )

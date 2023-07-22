@@ -3,7 +3,8 @@ import {isCollided} from "../utils/IsCollided.js";
 
 class Player extends Sprite {
     constructor({context, position, gravity, animations, scale, obstacles = []}) {
-        super({context, position, scale, image: animations.idle})
+        const offset = {bottom: -5}
+        super({context, position, scale, image: animations.idle, offset})
         this.isRightDirection = true
         this.animations = animations
         this.currentAnimation = animations.idle
